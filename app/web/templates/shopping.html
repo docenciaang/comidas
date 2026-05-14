@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-grid two-up">
+  <article class="card">
+    <div class="section-head">
+      <h3>Lista actual</h3>
+      <span class="pill">{{ items|length }} items</span>
+    </div>
+    {% if items %}
+    <ul class="list">
+      {% for item in items %}
+      <li><strong>{{ item }}</strong></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No hay items generados todavia.</p>
+    {% endif %}
+  </article>
+  <article class="card accent-cyan">
+    <span class="kicker">Exportacion</span>
+    <h3>Archivo local actualizado</h3>
+    <p>{{ export_path }}</p>
+    <p class="muted">La lista se recalcula desde el menu semanal actual y el recetario cargado.</p>
+  </article>
+</section>
+{% endblock %}

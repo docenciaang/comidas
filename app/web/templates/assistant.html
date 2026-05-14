@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="card">
+  <div class="section-head">
+    <h3>Asistente familiar</h3>
+    <span class="pill">chat</span>
+  </div>
+  <form action="/web/assistant" method="post" class="stack-form">
+    <label>Pregunta<textarea name="message" rows="4" placeholder="¿Que como hoy?">{{ message }}</textarea></label>
+    <div class="form-actions">
+      <button type="submit">Enviar</button>
+    </div>
+  </form>
+
+  {% if answer %}
+  <div class="response-box">
+    <span class="kicker">Respuesta</span>
+    <p>{{ answer }}</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-grid split">
+  <article class="card">
+    <div class="section-head">
+      <h3>{% if editing_recipe %}Editar receta{% else %}Alta de receta{% endif %}</h3>
+      <span class="pill">{% if editing_recipe %}update{% else %}crear{% endif %}</span>
+    </div>
+    <form action="{% if editing_recipe %}/web/recipes/{{ editing_recipe.id }}/update{% else %}/web/recipes{% endif %}" method="post" class="stack-form">
+      <label>Nombre<input type="text" name="name" value="{{ form_recipe.name }}" required></label>
+      <label>Descripcion<textarea name="description" rows="3">{{ form_recipe.description }}</textarea></label>
+      <label>Ingredientes<textarea name="ingredients" rows="6" placeholder="Uno por linea" required>{{ form_recipe.ingredients }}</textarea></label>
+      <label>Pasos<textarea name="steps" rows="5" placeholder="Uno por linea">{{ form_recipe.steps }}</textarea></label>
+      <label>Tags<input type="text" name="tags" value="{{ form_recipe.tags }}" placeholder="vegano, rapido, horno"></label>
+      <label>Raciones<input type="number" name="servings" min="1" value="{{ form_recipe.servings }}"></label>
+      <label>URL origen<input type="url" name="source_url" value="{{ form_recipe.source_url }}" placeholder="https://..."></label>
+      <div class="form-actions">
+        <button type="submit">{% if editing_recipe %}Actualizar receta{% else %}Guardar receta{% endif %}</button>
+        {% if editing_recipe %}
+        <a class="button-link" href="/web/recipes">Cancelar</a>
+        {% endif %}
+      </div>
+    </form>
+  </article>
+
+  <article class="card">
+    <div class="section-head">
+      <h3>Recetario</h3>
+      <span class="pill">{{ recipes|length }} recetas</span>
+    </div>
+    <div class="stack-cards">
+      {% for recipe in recipes %}
+      <article class="subcard">
+        <div class="section-head compact">
+          <h4>{{ recipe.name }}</h4>
+          <span class="pill">#{{ recipe.id }}</span>
+        </div>
+        <p>{{ recipe.description or 'Sin descripcion' }}</p>
+        <div class="meta-line">
+          <span>{{ recipe.servings }} raciones</span>
+          <span>{{ recipe.tags or 'sin tags' }}</span>
+        </div>
+        <div class="meta-block">
+          <strong>Ingredientes</strong>
+          <p>{{ recipe.ingredients.replace('\n', ', ') }}</p>
+        </div>
+        <div class="card-actions">
+          <a class="button-link" href="/web/recipes?edit={{ recipe.id }}">Editar</a>
+          <form action="/web/recipes/{{ recipe.id }}/delete" method="post">
+            <button type="submit" class="danger-button">Eliminar</button>
+          </form>
+        </div>
+      </article>
+      {% else %}
+      <p class="muted">Todavia no hay recetas cargadas.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

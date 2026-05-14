@@ -1,0 +1,17 @@
+app_name: Gestor de Menus Familiares
+environment: development
+database_url: sqlite:///data/menu_familiar.db
+default_servings: 4
+api:
+  host: 127.0.0.1
+  port: 8010
+  basic_auth_user: admin
+  basic_auth_password: admin
+notifications:
+  enabled: false
+  ntfy_topic: ""
+ai:
+  provider: mock
+  model: family-menu-planner
+  temperature: 0.2
+cache_dir: data/cache

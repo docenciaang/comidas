@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} · {{ app_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-tag">WEB · FASTAPI · IA</div>
+        <h1>{{ app_name }}</h1>
+        <p>Planificador doméstico con interfaz integrada.</p>
+      </div>
+      <nav class="nav">
+        <a class="{% if active == 'dashboard' %}active{% endif %}" href="/web">Panel</a>
+        <a class="{% if active == 'menu' %}active{% endif %}" href="/web/menu">Menu semanal</a>
+        <a class="{% if active == 'shopping' %}active{% endif %}" href="/web/shopping">Compra</a>
+        <a class="{% if active == 'recipes' %}active{% endif %}" href="/web/recipes">Recetas</a>
+        <a class="{% if active == 'family' %}active{% endif %}" href="/web/family">Familia</a>
+        <a class="{% if active == 'assistant' %}active{% endif %}" href="/web/assistant">Asistente</a>
+        <a class="{% if active == 'system' %}active{% endif %}" href="/web/system">Sistema</a>
+      </nav>
+      <div class="sidebar-meta">
+        <span>Proveedor IA</span>
+        <strong>{{ ai_provider }}</strong>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <div class="eyebrow">{{ active }}</div>
+          <h2>{{ title }}</h2>
+        </div>
+      </header>
+
+      {% if notice %}
+      <div class="notice">{{ notice }}</div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

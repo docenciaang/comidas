@@ -1,0 +1,1 @@
+"""Servicios externos y adaptadores."""

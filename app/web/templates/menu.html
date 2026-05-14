@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-grid menu-layout">
+  <article class="card calendar-card">
+    <div class="section-head">
+      <h3>{{ month_calendar.month_label }}</h3>
+      <span class="pill">pulsa un dia</span>
+    </div>
+    <div class="calendar-nav">
+      <a class="button-link" href="/web/menu?week_start={{ week_start }}&month={{ month_calendar.prev_month }}">Mes anterior</a>
+      <a class="button-link" href="/web/menu?week_start={{ week_start }}&month={{ month_calendar.next_month }}">Mes siguiente</a>
+    </div>
+    <div class="calendar-frame">
+      <table class="month-calendar">
+        <thead>
+          <tr>
+            <th>L</th>
+            <th>M</th>
+            <th>X</th>
+            <th>J</th>
+            <th>V</th>
+            <th>S</th>
+            <th>D</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in month_calendar.weeks %}
+          <tr>
+            {% for day in week %}
+            <td class="{% if not day.in_month %}is-muted{% endif %}{% if day.is_selected_week %} is-active-week{% endif %}">
+              <a
+                class="calendar-day{% if day.is_today %} is-today{% endif %}{% if day.has_menu %} has-menu{% endif %}"
+                href="/web/menu?week_start={{ day.week_start }}&month={{ month_calendar.month_value }}"
+                title="Abrir semana {{ day.week_start }}"
+              >
+                <span class="calendar-day-number">{{ day.day_number }}</span>
+                {% if day.has_menu %}
+                <span class="calendar-dot"></span>
+                {% endif %}
+              </a>
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">Al pulsar cualquier dia se abre la semana de ese dia. El punto cyan indica semanas con menu guardado.</p>
+  </article>
+
+  <article class="card">
+  <div class="section-head">
+    <div>
+      <h3>Semana {{ week_start }}</h3>
+      <p class="muted">Rango visible: {{ week_start }} a {{ week_end }}</p>
+    </div>
+    <div class="card-actions">
+      <a class="button-link" href="/web/menu?week_start={{ prev_week }}&month={{ month_calendar.month_value }}">Semana anterior</a>
+      <a class="button-link" href="/web/menu?week_start={{ next_week }}&month={{ month_calendar.month_value }}">Semana siguiente</a>
+      <form action="/web/menu/suggest" method="post">
+        <input type="hidden" name="week_start" value="{{ week_start }}">
+        <input type="hidden" name="month" value="{{ month_calendar.month_value }}">
+        <button type="submit">Generar y guardar sugerencia IA</button>
+      </form>
+      <form action="/web/menu/delete" method="post">
+        <input type="hidden" name="week_start" value="{{ week_start }}">
+        <input type="hidden" name="month" value="{{ month_calendar.month_value }}">
+        <button type="submit" class="danger-button">Vaciar semana</button>
+      </form>
+    </div>
+  </div>
+
+  <form action="/web/menu/save" method="post" class="menu-form">
+    <input type="hidden" name="week_start" value="{{ week_start }}">
+    <input type="hidden" name="month" value="{{ month_calendar.month_value }}">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Dia</th>
+            <th>Plato</th>
+            <th>Tipo</th>
+            <th>Raciones</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for day, rows in menu_rows %}
+            {% for row in rows %}
+            <tr>
+              {% if loop.first %}
+              <td class="strong" rowspan="{{ rows|length }}">{{ day }}</td>
+              {% endif %}
+              <td>
+                <select name="{{ day }}_recipe">
+                  <option value="">Sin asignar</option>
+                  {% for recipe in recipes %}
+                  <option value="{{ recipe.name }}" {% if row.recipe_name == recipe.name %}selected{% endif %}>{{ recipe.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <select name="{{ day }}_meal_type">
+                  {% for meal_type in meal_type_options %}
+                  <option value="{{ meal_type }}" {% if row.meal_type == meal_type %}selected{% endif %}>{{ meal_type }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input type="number" min="1" name="{{ day }}_servings" value="{{ row.servings }}">
+              </td>
+              <td>
+                <input type="text" name="{{ day }}_notes" value="{{ row.notes }}">
+              </td>
+            </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="form-actions">
+      <button type="submit">Guardar menu manual</button>
+    </div>
+  </form>
+  </article>
+</section>
+{% endblock %}

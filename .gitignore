@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+
+data/*.db
+data/cache/
+data/shopping_list.txt
+data/family.json
+data/recipes/

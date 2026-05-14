@@ -1,0 +1,1 @@
+"""Capa core del dominio."""

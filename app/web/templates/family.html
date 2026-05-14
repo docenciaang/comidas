@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-grid split">
+  <article class="card">
+    <div class="section-head">
+      <h3>{% if editing_member %}Editar miembro{% else %}Nuevo miembro{% endif %}</h3>
+      <span class="pill">{% if editing_member %}update{% else %}perfil{% endif %}</span>
+    </div>
+    <form action="{% if editing_member %}/web/family/{{ editing_member.id }}/update{% else %}/web/family{% endif %}" method="post" class="stack-form">
+      <label>Nombre<input type="text" name="name" value="{{ form_member.name }}" required></label>
+      <label>Edad<input type="number" name="age" min="0" value="{{ form_member.age }}" required></label>
+      <label>Alergias<input type="text" name="allergies" value="{{ form_member.allergies }}" placeholder="marisco, lactosa"></label>
+      <label>Preferencias<input type="text" name="preferences" value="{{ form_member.preferences }}" placeholder="pasta, verduras"></label>
+      <label>Restricciones<input type="text" name="restrictions" value="{{ form_member.restrictions }}" placeholder="sin gluten, sin picante"></label>
+      <label>Comidas al dia<input type="number" name="meals_per_day" min="1" value="{{ form_member.meals_per_day }}"></label>
+      <div class="form-actions">
+        <button type="submit">{% if editing_member %}Actualizar miembro{% else %}Guardar miembro{% endif %}</button>
+        {% if editing_member %}
+        <a class="button-link" href="/web/family">Cancelar</a>
+        {% endif %}
+      </div>
+    </form>
+  </article>
+
+  <article class="card">
+    <div class="section-head">
+      <h3>Familia actual</h3>
+      <span class="pill">{{ family_context.count }} personas</span>
+    </div>
+    <div class="stack-cards">
+      {% for member in members %}
+      <article class="subcard">
+        <div class="section-head compact">
+          <h4>{{ member.name }}</h4>
+          <span class="pill">#{{ member.id }}</span>
+        </div>
+        <p>{{ member.age }} anos · {{ member.meals_per_day }} comidas/dia</p>
+        <div class="meta-line">
+          <span>{{ member.allergies or 'sin alergias' }}</span>
+          <span>{{ member.restrictions or 'sin restricciones' }}</span>
+        </div>
+        <p class="muted">Preferencias: {{ member.preferences or 'sin preferencias' }}</p>
+        <div class="card-actions">
+          <a class="button-link" href="/web/family?edit={{ member.id }}">Editar</a>
+          <form action="/web/family/{{ member.id }}/delete" method="post">
+            <button type="submit" class="danger-button">Eliminar</button>
+          </form>
+        </div>
+      </article>
+      {% else %}
+      <p class="muted">No hay miembros cargados.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

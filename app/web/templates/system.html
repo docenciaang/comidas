@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-grid two-up">
+  <article class="card">
+    <div class="section-head">
+      <h3>Acciones del sistema</h3>
+      <span class="pill">admin</span>
+    </div>
+    <div class="action-row">
+      <form action="/web/system/init-db" method="post">
+        <button type="submit">Inicializar base de datos</button>
+      </form>
+      <form action="/web/system/seed-demo" method="post">
+        <button type="submit">Cargar demo</button>
+      </form>
+    </div>
+    <div class="system-meta">
+      <p><strong>API</strong> {{ api_host }}:{{ api_port }}</p>
+      <p><strong>MCP local</strong> {{ mcp_name }}</p>
+    </div>
+  </article>
+
+  <article class="card">
+    <div class="section-head">
+      <h3>Tools MCP</h3>
+      <span class="pill">{{ mcp_tools|length }} tools</span>
+    </div>
+    <ul class="list">
+      {% for tool in mcp_tools %}
+      <li><strong>{{ tool }}</strong></li>
+      {% endfor %}
+    </ul>
+  </article>
+</section>
+
+<section class="card">
+  <div class="section-head">
+    <h3>Resources MCP</h3>
+    <span class="pill">diagnostico</span>
+  </div>
+  <pre class="resource-dump">{{ mcp_resources }}</pre>
+</section>
+{% endblock %}
