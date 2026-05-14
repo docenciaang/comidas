@@ -5,7 +5,7 @@ from datetime import date
 from fastapi import Depends, FastAPI, HTTPException, Response, status
 from fastapi.staticfiles import StaticFiles
 
-from app.ai.agent import AIAgent
+from app.ai.agent import AIAgent, AIAgentError
 from app.ai.assistant import FamilyAssistant
 from app.core.family import FamilyProfile
 from app.core.menu_manager import MenuManager
@@ -33,6 +33,8 @@ app.include_router(web_router)
 @app.on_event("startup")
 def startup_event() -> None:
     init_db()
+    with get_session() as session:
+        MenuManager(session).normalize_stored_week_starts()
 
 
 @app.get("/health")
@@ -44,7 +46,7 @@ def health() -> dict:
 def get_week_menu(week_start: date | None = None) -> dict:
     with get_session() as session:
         manager = MenuManager(session)
-        selected_week = week_start or manager.get_current_week_start()
+        selected_week = manager.normalize_week_start(week_start) if week_start else manager.get_current_week_start()
         items = manager.list_week_menu(week_start)
         return {
             "week_start": str(selected_week),
@@ -69,17 +71,23 @@ def update_week_menu(payload: MenuSuggestion) -> dict:
 @app.delete("/menus/week", dependencies=[Depends(require_auth)])
 def delete_week_menu(week_start: date) -> dict:
     with get_session() as session:
-        deleted = MenuManager(session).delete_week_menu(week_start)
+        manager = MenuManager(session)
+        normalized_week_start = manager.normalize_week_start(week_start)
+        deleted = manager.delete_week_menu(normalized_week_start)
         if deleted == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No existe menu para esa semana")
-        return {"deleted_items": deleted, "week_start": week_start.isoformat()}
+        return {"deleted_items": deleted, "week_start": normalized_week_start.isoformat()}
 
 
 @app.post("/suggest", dependencies=[Depends(require_auth)])
 def suggest_week_menu(week_start: date | None = None) -> dict:
     with get_session() as session:
-        start = week_start or MenuManager(session).get_current_week_start()
-        suggestion = AIAgent(session).suggest_week_menu(start)
+        manager = MenuManager(session)
+        start = manager.normalize_week_start(week_start) if week_start else manager.get_current_week_start()
+        try:
+            suggestion = AIAgent(session).suggest_week_menu(start)
+        except AIAgentError as exc:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
         return suggestion.model_dump()
 
 

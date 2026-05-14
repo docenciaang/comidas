@@ -66,12 +66,29 @@ La web reutiliza la misma Basic Auth que la API.
 
 Editar `.env` para configurar proveedor IA y claves si se quiere salir del modo mock.
 
+Ejemplo minimo para usar OpenAI en `/suggest`:
+
+```env
+OPENAI_API_KEY=tu_clave
+```
+
+Configurar [config.yaml](/home/asuarez/claude/comidas/menu_familiar/config.yaml) asi:
+
+```yaml
+ai:
+  provider: openai
+  model: gpt-4.1-mini
+  temperature: 0.2
+```
+
+Si no quieres usar la API real, deja `provider: mock`.
+
 ## Estado actual
 
 El proyecto deja un flujo funcional de base:
 
 1. Carga configuracion y crea la BD SQLite.
 2. Permite gestionar recetas, perfil familiar y menu semanal.
-3. Genera sugerencias semanales en modo mock o usando un proveedor real.
+3. Genera sugerencias semanales en modo mock o con OpenAI en `/suggest`.
 4. Expone recursos y tools mediante una capa MCP local simplificada.
 5. Incluye una interfaz web server-rendered para operar toda la funcionalidad actual.

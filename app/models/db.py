@@ -27,7 +27,7 @@ class NotificationConfig(BaseModel):
 
 class AIConfig(BaseModel):
     provider: str = "mock"
-    model: str = "family-menu-planner"
+    model: str = "gpt-4.1-mini"
     temperature: float = 0.2
 
 

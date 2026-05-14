@@ -446,7 +446,7 @@ flowchart LR
 ## Limitaciones Actuales
 
 - No hay migraciones Alembic configuradas aun.
-- No hay integracion real con OpenAI o Claude.
+- La generacion semanal puede funcionar en modo `mock` o con OpenAI segun `config.yaml` y `OPENAI_API_KEY`.
 - No hay tests automaticos.
 - La importacion de recetas desde URL es un placeholder.
 - El asistente conversacional todavia es basico.
