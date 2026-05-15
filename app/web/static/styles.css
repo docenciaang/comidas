@@ -11,6 +11,22 @@
   --ink: #0b0e14;
 }
 
+/* Light mode overrides */
+body.light-mode {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-alt: #fafafa;
+  --border: #e6e9ee;
+  --text: #0b0e14;
+  --muted: #6b7280;
+  --lime: #2a7a00;
+  --cyan: #0aa89f;
+  --coral: #d33;
+  --ink: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+  color: var(--text);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -40,15 +56,19 @@ body::before {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-rows: auto 1fr;
   min-height: 100vh;
 }
 
 .sidebar {
-  padding: 32px 24px;
-  border-right: 1px solid var(--border);
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
   background: rgba(10, 14, 20, 0.76);
   backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  justify-content: space-between;
 }
 
 .brand-tag,
@@ -58,6 +78,39 @@ body::before {
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: 11px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(223, 255, 95, 0.12);
+  color: var(--lime);
+  display: inline-grid;
+  place-items: center;
+}
+
+.brand-logo svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.brand-desc {
+  margin: 0 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .brand h1 {
@@ -74,20 +127,26 @@ body::before {
 }
 
 .nav {
-  display: grid;
+  display: flex;
   gap: 8px;
-  margin: 30px 0;
+  margin: 0 18px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  overflow-x: auto;
 }
 
 .nav a,
 .button-link {
-  display: block;
-  padding: 12px 14px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   color: var(--text);
   text-decoration: none;
   background: rgba(255, 255, 255, 0.02);
+  white-space: nowrap;
 }
 
 .nav a.active {
@@ -97,6 +156,33 @@ body::before {
 
 .main {
   padding: 28px;
+}
+
+@media (max-width: 680px) {
+  .sidebar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav {
+    justify-content: flex-start;
+    margin: 12px 0;
+    gap: 6px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-desc {
+    display: none;
+  }
+}
+
+/* Respaldo: forzar barra superior si hay estilos previos cacheados */
+.app-shell {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto 1fr !important;
 }
 
 .page-header h2 {
@@ -118,14 +204,217 @@ body::before {
   gap: 20px;
 }
 
+/* Layout for menu page: compact month calendar (left) + week form (right) */
+.menu-layout {
+  grid-template-columns: 280px 1fr;
+  align-items: start;
+  gap: 18px;
+}
+
+.menu-calendar-panel {
+  position: sticky;
+  top: 14px;
+  height: fit-content;
+}
+
+.menu-layout .month-calendar th {
+  padding: 6px 6px;
+  font-size: 12px;
+}
+
+.menu-layout .cal-cell {
+  padding: 0;
+  border: 0;
+  vertical-align: top;
+}
+
+.menu-layout .cal-cell.out-month {
+  opacity: 0.4;
+}
+
+.menu-layout .cal-cell.today .calendar-day {
+  border-color: rgba(223, 255, 95, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(223, 255, 95, 0.35);
+}
+
+.menu-layout .cal-cell.selected-week .calendar-day {
+  background: rgba(223, 255, 95, 0.08);
+  border-color: rgba(223, 255, 95, 0.4);
+}
+
+.menu-layout .calendar-day {
+  min-height: 40px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.menu-layout .calendar-day-number {
+  font-size: 13px;
+}
+
+.menu-layout .calendar-frame {
+  padding: 8px;
+}
+
+.menu-layout .table-wrap table th,
+.menu-layout .table-wrap table td {
+  padding: 8px 6px;
+}
+
+/* Weekly menu per-day card layout */
+.week-days-form {
+  display: grid;
+  gap: 12px;
+}
+
+.day-form-card {
+  padding: 12px;
+}
+
+.day-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 100px 2fr 120px 80px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+.form-row .hidden-select { display: none; }
+.form-row.editing .hidden-select { display: block; }
+
+/* Ensure select/combo is wide enough to show options */
+.form-row .recipe-field select,
+.form-row .recipe-field .hidden-select {
+  min-width: 220px;
+  width: 100%;
+}
+
+/* Hide select inputs by default; show when row is in editing state */
+.form-row .hidden-select { display: none; }
+.form-row.editing .hidden-select { display: block; }
+
+/* When a row is collapsed (not editing), hide type and servings columns */
+.form-row.collapsed .type-field,
+.form-row.collapsed .servings-field { display: none; }
+
+.form-row .field select,
+.form-row .field input {
+  width: 100%;
+}
+
+.recipe-field { grid-column: 1 / 2; }
+.type-field { grid-column: 2 / 3; }
+.servings-field { grid-column: 3 / 4; }
+.notes-field { grid-column: 4 / 5; }
+
+.day-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding-right: 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.day-label .pill.small {
+  display: inline-block;
+  padding: 4px 6px;
+  font-size: 11px;
+  margin-top: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.day-label.empty { visibility: hidden; }
+
+/* Compact calendar for menu page */
+.menu-layout .month-calendar {
+  border-spacing: 4px;
+}
+
+/* Recipe add/edit inline */
+.recipe-select-wrapper { display: flex; align-items: center; gap: 8px; }
+.hidden-select { display: none; }
+.assigned-recipe { display: flex; gap: 8px; align-items: center; }
+.assigned-recipe.empty { color: var(--muted); }
+.assigned-recipe strong { font-weight: 700; }
+.edit-recipe, .add-recipe { padding: 6px 8px; }
+
+@media (max-width: 900px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-row .field {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1080px) {
+  .menu-layout {
+    grid-template-columns: 1fr;
+  }
+  .menu-calendar-panel {
+    position: static;
+  }
+}
+
+/* Compact dashboard spacing */
+.dashboard-compact .hero-grid,
+.dashboard-compact .content-grid,
+.dashboard-compact .metric-grid,
+.dashboard-compact .week-grid {
+  gap: 10px;
+}
+
+.dashboard-compact .card,
+.dashboard-compact .metric-card,
+.dashboard-compact .day-card,
+.dashboard-compact .subcard {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.dashboard-compact .section-head {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.dashboard-compact .page-header h2 {
+  font-size: clamp(22px, 3.5vw, 34px);
+}
+
+.dashboard-compact .brand-desc {
+  display: none;
+}
+
+.dashboard-compact .week-grid {
+  grid-template-columns: repeat(7, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.dashboard-compact .calendar-frame {
+  padding: 8px;
+}
+
+.dashboard-compact .calendar-day {
+  min-height: 56px;
+  padding: 8px;
+}
+
 .hero-grid {
   grid-template-columns: 1.4fr 1fr;
   margin-bottom: 20px;
 }
 
 .content-grid.two-up,
-.content-grid.split,
-.content-grid.menu-layout {
+.content-grid.split {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 20px;
 }
@@ -232,6 +521,49 @@ body::before {
   gap: 10px;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Compact recipe list inline actions */
+.compact-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.compact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.compact-name {
+  font-weight: 700;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.compact-actions .button-link,
+.compact-actions button {
+  width: auto;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.compact-actions form {
+  display: inline-block;
+  margin: 0;
 }
 
 .stack-form,
@@ -347,8 +679,8 @@ button:hover,
 }
 
 .month-calendar td.is-active-week .calendar-day {
-  background: rgba(223, 255, 95, 0.12);
-  border-color: var(--lime);
+  background: rgba(223, 255, 95, 0.08);
+  border-color: rgba(223, 255, 95, 0.4);
 }
 
 .calendar-day {
@@ -379,6 +711,12 @@ button:hover,
 
 .calendar-day.has-menu {
   box-shadow: inset 0 0 0 1px rgba(94, 240, 215, 0.45);
+}
+
+.month-calendar td.is-active-week .calendar-day.has-menu {
+  box-shadow:
+    inset 0 0 0 1px rgba(94, 240, 215, 0.45),
+    inset 0 0 0 2px rgba(223, 255, 95, 0.12);
 }
 
 .calendar-dot {
@@ -424,11 +762,9 @@ td[rowspan] {
 }
 
 @media (max-width: 1080px) {
-  .app-shell,
   .hero-grid,
   .content-grid.two-up,
-  .content-grid.split,
-  .content-grid.menu-layout {
+  .content-grid.split {
     grid-template-columns: 1fr;
   }
 
@@ -464,4 +800,72 @@ td[rowspan] {
   .month-calendar {
     border-spacing: 4px;
   }
+}
+
+/* Light mode: override component backgrounds and controls to ensure readability */
+body.light-mode {
+  --surface: #ffffff;
+  --surface-alt: #fafafa;
+  --border: #e6e9ee;
+  --text: #0b0e14;
+  --muted: #6b7280;
+}
+
+body.light-mode::before {
+  display: none;
+}
+
+body.light-mode .card,
+body.light-mode .metric-card,
+body.light-mode .day-card,
+body.light-mode .subcard,
+body.light-mode .response-box {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.light-mode .sidebar {
+  background: var(--surface);
+  border-bottom-color: var(--border);
+}
+
+body.light-mode .brand-logo {
+  background: rgba(42,122,0,0.07);
+  color: var(--lime);
+}
+
+body.light-mode input,
+body.light-mode select,
+body.light-mode textarea,
+body.light-mode button {
+  background: var(--surface-alt);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.light-mode .button-link {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.light-mode .calendar-day {
+  background: var(--surface-alt);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.light-mode .month-calendar th {
+  color: var(--muted);
+}
+
+body.light-mode .calendar-dot {
+  background: var(--cyan);
+}
+
+body.light-mode .notice {
+  background: rgba(94, 240, 215, 0.12);
+  border-color: rgba(94, 240, 215, 0.2);
+  color: var(--text);
 }

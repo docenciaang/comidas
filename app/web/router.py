@@ -115,7 +115,7 @@ def _build_month_calendar(menu_manager: MenuManager, month_value: str, selected_
     last_day = date(year, month, monthrange(year, month)[1])
     grid_start = _week_start_for(first_day)
     grid_end = _week_start_for(last_day) + timedelta(days=6)
-    saved_weeks = set(menu_manager.list_saved_week_starts(grid_start, grid_end))
+    scheduled_dates = set(menu_manager.list_scheduled_dates(grid_start, grid_end))
     today = date.today()
     weeks: list[list[dict]] = []
     current = grid_start
@@ -132,7 +132,7 @@ def _build_month_calendar(menu_manager: MenuManager, month_value: str, selected_
                     "is_today": day == today,
                     "is_selected_week": week_start == selected_week,
                     "week_start": week_start.isoformat(),
-                    "has_menu": week_start in saved_weeks,
+                    "has_menu": day in scheduled_dates,
                 }
             )
         weeks.append(week_days)
@@ -186,7 +186,7 @@ def menu_page(request: Request, week_start: str | None = None, month: str | None
     selected_week = date.fromisoformat(week_start) if week_start else None
     with get_session() as session:
         menu_manager = MenuManager(session)
-        current_week = selected_week or menu_manager.get_current_week_start()
+        current_week = menu_manager.normalize_week_start(selected_week) if selected_week else menu_manager.get_current_week_start()
         week_table = menu_manager.as_week_table(current_week)
         month_value = _resolve_month(current_week, month)
         month_calendar = _build_month_calendar(menu_manager, month_value, current_week)
@@ -198,8 +198,11 @@ def menu_page(request: Request, week_start: str | None = None, month: str | None
                 "week_start": current_week.isoformat(),
                 "week_end": (current_week + timedelta(days=6)).isoformat(),
                 "recipes": recipes,
-                "week_days": [(day, week_table.get(day, [])) for day in DAYS],
-                "menu_rows": [(day, _menu_day_rows(week_table.get(day, []))) for day in DAYS],
+                        "week_days": [(day, week_table.get(day, [])) for day in DAYS],
+                        "menu_rows": [
+                            (day, (current_week + timedelta(days=i)), _menu_day_rows(week_table.get(day, [])))
+                            for i, day in enumerate(DAYS)
+                        ],
                 "menu_slots_per_day": MENU_SLOTS_PER_DAY,
                 "meal_type_options": MEAL_TYPE_OPTIONS,
                 "month_calendar": month_calendar,
@@ -213,7 +216,7 @@ def menu_page(request: Request, week_start: str | None = None, month: str | None
 @router.post("/web/menu/save", dependencies=[Depends(require_auth)])
 async def save_menu(request: Request) -> RedirectResponse:
     form = await request.form()
-    week_start = date.fromisoformat(str(form.get("week_start")))
+    week_start = MenuManager.normalize_week_start(date.fromisoformat(str(form.get("week_start"))))
     month_value = str(form.get("month") or week_start.strftime("%Y-%m"))
     items: list[MenuSuggestionItem] = []
     for day in DAYS:
@@ -246,7 +249,7 @@ async def save_menu(request: Request) -> RedirectResponse:
 @router.post("/web/menu/suggest", dependencies=[Depends(require_auth)])
 async def suggest_menu(request: Request) -> RedirectResponse:
     form = await request.form()
-    week_start = date.fromisoformat(str(form.get("week_start")))
+    week_start = MenuManager.normalize_week_start(date.fromisoformat(str(form.get("week_start"))))
     month_value = str(form.get("month") or week_start.strftime("%Y-%m"))
     with get_session() as session:
         suggestion = AIAgent(session).suggest_week_menu(week_start)
@@ -257,7 +260,7 @@ async def suggest_menu(request: Request) -> RedirectResponse:
 @router.post("/web/menu/delete", dependencies=[Depends(require_auth)])
 async def delete_menu(request: Request) -> RedirectResponse:
     form = await request.form()
-    week_start = date.fromisoformat(str(form.get("week_start")))
+    week_start = MenuManager.normalize_week_start(date.fromisoformat(str(form.get("week_start"))))
     month_value = str(form.get("month") or week_start.strftime("%Y-%m"))
     with get_session() as session:
         deleted = MenuManager(session).delete_week_menu(week_start)

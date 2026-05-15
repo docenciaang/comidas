@@ -8,26 +8,43 @@
 </head>
 <body>
   <div class="app-shell">
-    <aside class="sidebar">
+    <header class="sidebar topbar">
       <div class="brand">
-        <div class="brand-tag">WEB · FASTAPI · IA</div>
-        <h1>{{ app_name }}</h1>
-        <p>Planificador doméstico con interfaz integrada.</p>
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none">
+              <path d="M3 2v6" />
+              <path d="M6 2v6" />
+              <path d="M9 2v6" />
+              <path d="M6 13v7" />
+              <path d="M20 3l-4 14-1.5 1.5" />
+            </g>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-tag">WEB · FASTAPI · IA</div>
+          <h1>{{ app_name }}</h1>
+        </div>
       </div>
+
       <nav class="nav">
-        <a class="{% if active == 'dashboard' %}active{% endif %}" href="/web">Panel</a>
+        <a class="{% if active == 'dashboard' %}active{% endif %}" href="/web#today">Hoy</a>
         <a class="{% if active == 'menu' %}active{% endif %}" href="/web/menu">Menu semanal</a>
+        <a class="{% if active == 'dashboard' %}active{% endif %}" href="/web">Panel</a>
         <a class="{% if active == 'shopping' %}active{% endif %}" href="/web/shopping">Compra</a>
         <a class="{% if active == 'recipes' %}active{% endif %}" href="/web/recipes">Recetas</a>
         <a class="{% if active == 'family' %}active{% endif %}" href="/web/family">Familia</a>
         <a class="{% if active == 'assistant' %}active{% endif %}" href="/web/assistant">Asistente</a>
         <a class="{% if active == 'system' %}active{% endif %}" href="/web/system">Sistema</a>
       </nav>
+
       <div class="sidebar-meta">
+        <p class="brand-desc">Planificador doméstico con interfaz integrada.</p>
         <span>Proveedor IA</span>
         <strong>{{ ai_provider }}</strong>
+        <button id="theme-toggle" class="button-link" type="button" aria-label="Alternar tema">🌓</button>
       </div>
-    </aside>
+    </header>
 
     <main class="main">
       <header class="page-header">
@@ -44,5 +61,22 @@
       {% block content %}{% endblock %}
     </main>
   </div>
+  <script>
+    (function(){
+      const toggle = document.getElementById('theme-toggle');
+      const body = document.body;
+      function setTheme(mode){
+        if(mode === 'light') body.classList.add('light-mode');
+        else body.classList.remove('light-mode');
+        try{ localStorage.setItem('theme', mode); }catch(e){}
+        if(toggle) toggle.textContent = mode === 'light' ? '🌙' : '☀️';
+      }
+      const saved = (function(){ try{return localStorage.getItem('theme')}catch(e){return null} })() || 'dark';
+      setTheme(saved);
+      if(toggle){
+        toggle.addEventListener('click', function(){ setTheme(body.classList.contains('light-mode') ? 'dark' : 'light'); });
+      }
+    })();
+  </script>
 </body>
 </html>
